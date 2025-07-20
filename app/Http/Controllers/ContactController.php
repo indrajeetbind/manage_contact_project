@@ -46,14 +46,14 @@ class ContactController extends Controller
                 $file = $request->file('profile_image');
                 $filename = 'profile_' . now()->timestamp . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
 
-                $file->storeAs('public/profile_images', $filename);
+                $file->storeAs('profile_images', $filename,'public');
                 $contact->profile_image = $filename;
             }
 
             if ($request->hasFile('additional_file')) {
                 $file = $request->file('additional_file');
                 $filename = 'doc_' . now()->timestamp . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->storeAs('public/additional_files', $filename);
+                $file->storeAs('additional_files', $filename,'public');
                 $contact->additional_file = $filename;
             }
 

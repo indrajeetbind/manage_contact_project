@@ -76,6 +76,8 @@ $(document).ready(function () {
         $('#contact_id').val('');      // Clear hidden ID
         $('#contactModalTitle').text('Add Contact');
         $('#saveContactBtn').text('Save Contact');
+        $('#contactModal .profile-preview').remove();
+        $('#contactModal .additional-file-preview').remove();
         $('#contactModal').modal('show');
         $('.custom-field-container').empty(); // Clear custom fields
         if (customFields.length > 0) {
@@ -429,7 +431,7 @@ $(document).ready(function () {
     });
 
     function editContact(id) {
-        console.log('Editing contact with ID:', id);
+        // console.log('Editing contact with ID:', id);
         // Fetch contact data and populate the form for editing
         $.ajax({
             url: `/contacts/${id}/edit`,
@@ -450,18 +452,25 @@ $(document).ready(function () {
         $('#saveContactBtn').text('Update Contact');  // safer for user input
 
         $('#contact_id').val(id);  // Set hidden input with contact ID
-        console.log('Populating form with contact data:', data.contact.custom_field_values);
+        // console.log('Populating form with contact data:', data.contact.custom_field_values);
         $('input[name="name"]').val(data.contact.name);
         $('input[name="email"]').val(data.contact.email);
         $('input[name="phone"]').val(data.contact.phone);
         $(`input[name="gender"][value="${data.contact.gender}"]`).prop('checked', true); // fixes gender
         // Handle profile image
+        $('#contactModal .profile-preview').remove();
         if (data.contact.profile_image) {
-            $('input[name="profile_image"]').after(`<img src="${data.contact.profile_image}" alt="Profile Image" class="img-thumbnail mt-2" style="max-width: 100px;">`);
-        } 
+            const imageUrl = `/storage/profile_images/${data.contact.profile_image}`;
+            $('input[name="profile_image"]').after(`
+                <img src="${imageUrl}" alt="Profile Image" class="img-thumbnail mt-2 profile-preview" style="max-width: 100px;">
+            `);
+        }
+
+          $('#contactModal .additional-file-preview').remove();
         // Handle additional file
         if (data.contact.additional_file) {
-            $('input[name="additional_file"]').after(`<a href="${data.contact.additional_file}" target="_blank">View Additional File</a>`);
+            const additionalFileUrl = `/storage/additional_files/${data.contact.additional_file}`;
+            $('input[name="additional_file"]').after(`<a href="${additionalFileUrl}" class="additional-file-preview" target="_blank">View Additional File</a>`);
         }
         // Handle custom fields
         $('.custom-field-container').empty(); // Clear existing custom fields
