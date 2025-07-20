@@ -8,7 +8,7 @@ class contact extends Model
 {
     protected $table = 'contacts';
 
-    protected $fillable = ['name','email','phone','gender','profile_image','additional_file'];
+    protected $fillable = ['name','email','phone','gender','profile_image','additional_file','status'];
 
     public function customFieldValues()
     {

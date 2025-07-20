@@ -37,21 +37,8 @@
                     </div>
                     <div class="col-12 custom-field-container">
                         <label>Custom Fields</label>
-                            @foreach($custom_fields as $field)
-                                <div class="mb-3">
-                                    <label>{{ $field->label }}</label>
-                                    <input type="hidden" name="custom_fields[{{ $field->id }}][label]" value="{{ $field->label }}">
-                                    @if($field->type === 'date')
-                                        <input type="date" name="custom_fields[{{ $field->id }}][value]" class="form-control">
-                                    @elseif($field->type === 'number')
-                                        <input type="number" name="custom_fields[{{ $field->id }}][value]" class="form-control">
-                                    @else
-                                        <input type="text" name="custom_fields[{{ $field->id }}][value]" class="form-control">
-                                    @endif
-                                </div>
-                            @endforeach
-<!-- Custom fields will be dynamically added here -->
-                        </div>
+                        <!-- Custom fields will be dynamically added here -->
+                    </div>
                 </div>
 
                 <div class="modal-footer">

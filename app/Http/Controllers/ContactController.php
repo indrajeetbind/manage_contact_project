@@ -8,8 +8,7 @@ use App\Models\Contact;
 use App\Models\ContactCustomField;
 use App\Models\ContactCustomFieldValue;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-
+use App\Models\MergedContact;
 class ContactController extends Controller
 {
     public function index()
@@ -93,15 +92,19 @@ class ContactController extends Controller
     // 4. AJAX Filtering Example
     public function filter(Request $request)
     {
+        // dd($request->all());
         $query = Contact::query();
 
-        if ($request->filled('name')) {
+        if (isset($request['name']) && $request['name'] != '') {
             $query->where('name', 'like', "%{$request->name}%");
         }
-        if ($request->filled('email')) {
+        if (isset($request['email']) && $request['email'] != '') {
             $query->where('email', 'like', "%{$request->email}%");
         }
-        if ($request->filled('gender')) {
+        if (isset($request['phone']) && $request['phone'] != '') {
+            $query->where('phone', 'like', "%{$request->phone}%");
+        }
+        if (isset($request['gender']) && $request['gender'] != '') {
             $query->where('gender', $request->gender);
         }
 
@@ -170,4 +173,36 @@ class ContactController extends Controller
             return response()->json(['status_code'=>500,'message' => 'Error: ' . $e->getMessage()], 500);
         }
     }
+
+    // Merge contacts
+    public function mergeContacts(Request $request)
+    {
+        // dd($request->all());
+        $masterId = $request->master_contact_id;
+        $to_contact_id = $request->to_contact_id;
+        $contact_id = $request->contact_id; // contact_id is merged into to_contact_id
+
+        // $master = Contact::findOrFail($masterId);
+        
+        // Save merge record in merged_contacts table
+        MergedContact::create([
+            'master_contact_id' => $masterId,
+            'to_contact_id' => $to_contact_id,
+            'contact_id' => $contact_id,
+            'merged_at' => now(),
+        ]);
+        
+        // Mark secondary contact as merged (optional status field)
+        $secondary = Contact::where('id',$contact_id)->update(['status' => 'merged']);
+        $secondary = Contact::where('id',$to_contact_id)->update(['status' => 'master']);
+
+        return response()->json(['status_code'=>200,'message' => 'Contacts merged successfully']);
+    }
+
+    public function mergedContacts($id)
+    {
+        $mergedContacts = MergedContact::with(['mergedContact', 'destinationContact', 'masterContact'])->where('contact_id', $id)->orWhere('to_contact_id', $id)->get();
+        return response()->json(['merged_contacts' => $mergedContacts]);
+    }
+
 }

@@ -8,6 +8,13 @@ use App\Models\ContactCustomField;
 
 class CustomFieldController extends Controller
 {
+    public function index()
+    {
+        $fields = ContactCustomField::all();
+
+        return response()->json(['custom_fields' => $fields]);
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -23,5 +30,5 @@ class CustomFieldController extends Controller
 
         return response()->json(['message' => 'Custom field created successfully.']);
     }
-    
+
 }
